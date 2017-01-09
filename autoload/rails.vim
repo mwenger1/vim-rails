@@ -3216,32 +3216,7 @@ function! s:Alternate(cmd,line1,line2,count,...) abort
     if empty(file)
       let file = rails#buffer().alternate(a:count)
     endif
-    let has_path = !empty(file) && rails#app().has_path(file)
-    let confirm = &confirm || (histget(':', -1) =~# '\%(^\||\)\s*conf\%[irm]\>')
-    if confirm && !a:count && !has_path
-      let projected = rails#buffer().projected_with_raw('alternate')
-      call filter(projected, 'rails#app().has_path(matchstr(v:val[1], "^[^{}]*/"))')
-      if len(projected)
-        let choices = ['Create alternate file?']
-        let i = 0
-        for [alt, _] in projected
-          let i += 1
-          call add(choices, i.' '.alt)
-        endfor
-        let i = inputlist(choices)
-        if i > 0 && i <= len(projected)
-          let file = projected[i-1][0] . '!'
-        else
-          return ''
-        endif
-      endif
-    endif
-    if empty(file)
-      call s:error("No alternate file defined")
-      return ''
-    else
-      return s:find(a:cmd, rails#app().path(file))
-    endif
+    return s:edit(a:cmd, rails#app().path(file))
   endif
 endfunction
 
